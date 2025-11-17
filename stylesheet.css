@@ -90,13 +90,13 @@ h1, h2 {
 
 /* レスポンシブ画像 */
 #map-image {
-    max-width: 100%;
+    width: 100%;
+    max-width: 600px;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease; /* 切り替え時にフェード */
+    transition: opacity 0.3s ease;
 }
-
 /* 戻るリンク */
 .back-link {
     display: block;
