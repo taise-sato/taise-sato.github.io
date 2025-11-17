@@ -91,12 +91,13 @@ h1, h2 {
 /* レスポンシブ画像 */
 #map-image {
     width: 100%;
-    max-width: 300px;
+    max-width: 100%;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: opacity 0.3s ease;
 }
+
 /* 戻るリンク */
 .back-link {
     display: block;
@@ -118,7 +119,7 @@ h1, h2 {
         padding: 15px;
     }
     .btn {
-        width: 100%; /* スマホではボタンを横幅いっぱいに */
+        width: 50%; /* スマホではボタンを横幅いっぱいに */
         flex-basis: 100%;
     }
 }
