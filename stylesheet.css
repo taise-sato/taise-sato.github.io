@@ -223,3 +223,7 @@ body {
 .container {
     padding: 20px 20px;
 }
+svg text {
+    /* 💡 変更: フォントファミリーを 'Zen Kaku Gothic Antique' に変更 */
+    font-family: 'Zen Kaku Gothic Antique', sans-serif !important; 
+}
