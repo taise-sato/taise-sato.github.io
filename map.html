@@ -3,61 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スキー場マップ - レイヤー制御</title>
+    <title>スキー場マップ</title>
     
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
 
-    <div class="control-panel">
-        <h3>表示要素の切り替え</h3>
-        
-        <div class="control-item">
-            <label>
-                <input type="checkbox" checked data-target-id="15_SubCoursename,14_Objectname"> 
-                地名
-            </label>
+    <div class="container">
+        <h1>Sapporo_KOKUSAI_Ski_Area_Map</h1>
+
+        <div class="control-panel">
+            <h3>表示要素の切り替え</h3>
+            
+            <div class="control-item">
+                <label>
+                    <input type="checkbox" checked data-target-id="15_SubCoursename,14_Objectname"> 
+                    地名
+                </label>
+            </div>
+
+            <div class="control-item">
+                <label>
+                    <input type="checkbox" checked data-target-id="25_Orangename,24_orange"> 
+                    オレンジフェンス
+                </label>
+            </div>
+
+            <div class="control-item">
+                <label>
+                    <input type="checkbox" checked data-target-id="27_Banarname,26_banar"> 
+                    バナー
+                </label>
+            </div>
+
+            <div class="control-item">
+                <label>
+                    <input type="checkbox" checked data-target-id="56_Frags,55_Frags,54_Frags,53_Frags,52_Frags,51_Frags,50_Frags"> 
+                    フラッグ
+                </label>
+            </div>
         </div>
 
-        <div class="control-item">
-            <label>
-                <input type="checkbox" checked data-target-id="25_Orangename,24_orange"> 
-                オレンジフェンス
-            </label>
-        </div>
+        <div id="map-container">
+            <svg id="ski-map" width="800" height="600" viewBox="0 0 800 600">
+                <rect width="800" height="600" fill="#e0f7fa" stroke="#ccc"/>
+                
+                <g id="15_SubCoursename" fill="#333"><text x="50" y="50" font-size="20">コース名A</text></g>
+                <g id="14_Objectname" fill="#333"><text x="50" y="70" font-size="20">建物名B</text></g>
 
-        <div class="control-item">
-            <label>
-                <input type="checkbox" checked data-target-id="27_Banarname,26_banar"> 
-                バナー
-            </label>
-        </div>
+                <g id="25_Orangename" fill="#ff7f00"><rect x="100" y="100" width="150" height="5"/></g>
+                <g id="24_orange" fill="#ff7f00"><rect x="100" y="120" width="100" height="5"/></g>
 
-        <div class="control-item">
-            <label>
-                <input type="checkbox" checked data-target-id="56_Frags,55_Frags,54_Frags,53_Frags,52_Frags,51_Frags,50_Frags"> 
-                フラッグ
-            </label>
+                <g id="27_Banarname" fill="#0056b3"><text x="300" y="50" font-size="20">バナーX</text></g>
+                <g id="26_banar" fill="#0056b3"><text x="300" y="70" font-size="20">バナーY</text></g>
+
+                <g id="56_Frags" fill="#d9534f"><circle cx="500" cy="50" r="5"/></g>
+                <path d="M50 500 L750 500" stroke="#000" stroke-width="5" />
+            </svg>
         </div>
     </div>
-
-    <div id="map-container">
-        <svg id="ski-map" width="800" height="600" viewBox="0 0 800 600">
-            <rect width="800" height="600" fill="#e0f7fa" stroke="#ccc"/>
-            
-            <g id="15_SubCoursename" fill="#333"><text x="50" y="50" font-size="20">コース名A</text></g>
-            <g id="14_Objectname" fill="#333"><text x="50" y="70" font-size="20">建物名B</text></g>
-
-            <g id="25_Orangename" fill="#ff7f00"><rect x="100" y="100" width="150" height="5"/></g>
-            <g id="24_orange" fill="#ff7f00"><rect x="100" y="120" width="100" height="5"/></g>
-
-            <g id="27_Banarname" fill="#0056b3"><text x="300" y="50" font-size="20">バナーX</text></g>
-            <g id="26_banar" fill="#0056b3"><text x="300" y="70" font-size="20">バナーY</text></g>
-
-            <g id="56_Frags" fill="#d9534f"><circle cx="500" cy="50" r="5"/></g>
-            <path d="M50 500 L750 500" stroke="#000" stroke-width="5" />
-        </svg>
-        </div>
 
     <script src="script.js"></script>
 </body>

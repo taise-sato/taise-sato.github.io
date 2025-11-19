@@ -23,7 +23,47 @@ h1, h2 {
     color: #2c3e50;
 }
 
-/* メインページ (index.html) の中央配置 */
+/* --- 【追加】表示/非表示制御のためのCSS --- */
+/* JavaScriptによりこのクラスが付与された要素は非表示になる */
+.is-hidden {
+    display: none !important;
+}
+
+/* --- 【調整】control-panel のスタイル --- */
+.control-panel {
+    /* map.htmlの.control-panelに適用 */
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px 0;
+    justify-content: center;
+}
+
+.control-panel h3 {
+    width: 100%;
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.control-item label {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    cursor: pointer;
+    user-select: none;
+    padding: 5px 10px; /* 見た目を整える */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+.control-item input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1); 
+    accent-color: #3498db; 
+}
+/* --- (既存のスタイルを保持) --- */
 .center-content {
     text-align: center;
     padding-top: 50px;
@@ -49,9 +89,10 @@ h1, h2 {
 }
 
 /* マップページ (map.html) のボタングループ */
+/* 今回はチェックボックス制御のため使用しませんが、既存のコードを保持 */
 .button-group {
     display: flex;
-    flex-wrap: wrap; /* スマホで折り返す */
+    flex-wrap: wrap; 
     gap: 10px;
     margin-bottom: 20px;
     justify-content: center;
@@ -66,8 +107,8 @@ h1, h2 {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
-    flex-grow: 1; /* ボタンが均等に伸びる */
-    flex-basis: 150px; /* 最小幅 */
+    flex-grow: 1; 
+    flex-basis: 150px; 
 }
 
 .btn:hover {
@@ -75,7 +116,6 @@ h1, h2 {
     transform: translateY(-2px);
 }
 
-/* 選択中のボタンのデザイン */
 .btn.active {
     background-color: #3498db;
     color: #fff;
@@ -119,7 +159,7 @@ h1, h2 {
         padding: 15px;
     }
     .btn {
-        width: 50%; /* スマホではボタンを横幅いっぱいに */
+        width: 50%; 
         flex-basis: 100%;
     }
 }
