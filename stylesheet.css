@@ -23,7 +23,7 @@ h1, h2 {
     color: #2c3e50;
 }
 
-/* --- 【追加】表示/非表示制御のためのCSS --- */
+/* --- 非表示制御のためのCSS --- */
 /* JavaScriptによりこのクラスが付与された要素は非表示になる */
 .is-hidden {
     display: none !important;
