@@ -1,43 +1,43 @@
-// DOM（HTML）の読み込みが完了したら実行
-document.addEventListener('DOMContentLoaded', function() {
-
-    // 1. 必要なHTML要素を取得
-    const image = document.getElementById('map-image');
-    const btnSimple = document.getElementById('btn-simple');
-    const btnNames = document.getElementById('btn-names');
-    const btnBanner = document.getElementById('btn-banner');
-    const btnFlag = document.getElementById('btn-flag');
-
-    // すべてのボタンを配列にまとめる
-    const buttons = [btnSimple, btnNames, btnBanner, btnFlag];
-
-    // 2. 画像のパスをマッピング（対応付け）
-    const imagePaths = {
-        'btn-simple': 'images/simple.jpg',
-        'btn-names': 'images/with_names.jpg',
-        'btn-banner': 'images/banner.jpg',
-        'btn-flag': 'images/flag.jpg'
-    };
-
-    // 3. 各ボタンにクリックイベントを追加
-    buttons.forEach(button => {
-        button.addEventListener('click', function() {
+/* =========================================
+   JavaScript: トグルボタンによる一括制御
+   ========================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    // ページ内の全てのチェックボックス要素を取得
+    const controlCheckboxes = document.querySelectorAll('.control-panel input[type="checkbox"]');
+    
+    // 全てのチェックボックスに対してイベントリスナーを設定
+    controlCheckboxes.forEach(checkbox => {
+        
+        // --- イベントリスナーの定義 ---
+        checkbox.addEventListener('change', (event) => {
+            // 制御対象のSVG IDリストを 'data-target-id' 属性から取得し、カンマで分割
+            const targetIds = event.target.dataset.targetId.split(',');
             
-            // (A) 画像を切り替える
-            const newImageSrc = imagePaths[this.id]; // this.idはクリックされたボタンのID
-            image.style.opacity = 0; // 一瞬透明にする（フェードアウト）
-
-            setTimeout(() => {
-                image.src = newImageSrc; // 画像のソースを更新
-                image.style.opacity = 1; // フェードイン
-            }, 200); // 0.2秒後に実行
-
-            // (B) 'active' クラスを管理する
-            // すべてのボタンから 'active' を削除
-            buttons.forEach(btn => btn.classList.remove('active'));
+            // チェックが入っているか (表示状態か) を判定
+            const isChecked = event.target.checked;
             
-            // クリックされたボタンに 'active' を追加
-            this.classList.add('active');
+            targetIds.forEach(id => {
+                // IDの前後にある不要な空白文字を削除し、対応するSVG要素を取得
+                const targetElement = document.getElementById(id.trim());
+                
+                if (targetElement) {
+                    if (isChecked) {
+                        // チェックあり -> 表示 (is-hidden クラスを削除)
+                        targetElement.classList.remove('is-hidden');
+                    } else {
+                        // チェックなし -> 非表示 (is-hidden クラスを付与)
+                        targetElement.classList.add('is-hidden');
+                    }
+                } else {
+                    // IDが見つからない場合はコンソールに警告を表示（デバッグ用）
+                    console.warn(`SVG要素が見つかりません: ID=${id.trim()}`);
+                }
+            });
         });
+        
+        // --- 初期状態の反映 ---
+        // ページロード時に、チェックボックスの初期状態（今回の場合は全て 'checked'）
+        // をSVG要素に反映させるために、意図的に 'change' イベントを発火させる
+        checkbox.dispatchEvent(new Event('change'));
     });
 });
