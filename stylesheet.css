@@ -1,29 +1,48 @@
-/* 基本設定 */
+/* =========================================
+   基本設定
+   ========================================= */
+html,
+body {
+    /* 💡 ページ端で引っ張ったときの「びよーん」と pull-to-refresh を抑える */
+    overscroll-behavior: none;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    /* 💡 変更: 背景画像をbody全体に設定 */
-    background-image: url('images/Kokusai_1.jpg');
-    background-size: cover; /* 画面全体を覆う */
-    background-position: center top; /* 上部中央から表示 */
-    background-repeat: no-repeat; /* 繰り返しなし */
-    background-attachment: fixed; /* スクロールしても背景を固定 */
     background-color: #f4f7f6; /* 画像が読み込めない場合のフォールバック */
     color: #333;
     margin: 0;
-    padding: 0; 
+    padding: 0;
     line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    /* フッターを画面下端に寄せる */
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
 }
+
+/* 💡 背景画像は疑似要素で固定（background-attachment: fixed は iOS で効かず、スクロールがガクつくため） */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: url('images/Kokusai_1.jpg') center top / cover no-repeat;
+}
+
 /* 全体のコンテナ (マップとコントロールパネルを含む領域) */
 .container {
-    max-width: 900px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 1280px;
+    margin: 20px auto 30px;
     padding: 20px;
-    /* 💡 変更: 背景画像を透けさせるため、半透明の白を設定 */
-    background-color: rgba(255, 255, 255, 0.9); 
+    /* 背景画像を透けさせるため、半透明の白を設定 */
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    /* 視認性向上のためシャドウを調整 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
 }
+
 h1, h2 {
     text-align: center;
     color: #2c3e50;
@@ -35,44 +54,462 @@ h1, h2 {
     display: none !important;
 }
 
-/* --- 【調整】control-panel のスタイル --- */
-.control-panel {
-    /* map.htmlの.control-panelに適用 */
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 15px 0;
-    justify-content: center;
+/* =========================================
+   マップ
+   ========================================= */
+.map-frame {
+    position: relative;
+    min-width: 0;
 }
 
-/* --- control-panelの見出しの調整 (中央寄せを維持) --- */
+/* マップの表示領域（ここでドラッグ・ピンチ・ホイールを受け取る） */
+.map-viewport {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 851 / 470;
+    max-height: calc(100svh - 120px);
+    overflow: hidden;
+    background-color: #fffefd;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    /* 💡 地図上の操作がページのスクロール・拡大に伝わらないようにする */
+    touch-action: none;
+    overscroll-behavior: contain;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.map-viewport.is-dragging {
+    cursor: grabbing;
+}
+
+.map-viewport svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.map-status {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 16px;
+    text-align: center;
+    color: #777;
+    font-size: 0.9em;
+}
+
+/* SVG内の文字 */
+svg text {
+    font-family: 'Zen Kaku Gothic Antique', sans-serif !important;
+}
+
+/* 💡 線と重なっても読めるよう、文字に白フチを付ける（em 指定で文字サイズに比例） */
+#map-container text {
+    paint-order: stroke;
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 0.16em;
+    stroke-linejoin: round;
+}
+
+/* バナー（黄色い四角）の中の文字はフチなし */
+#map-container #_x32_7_x5F_Banarname text {
+    stroke: none;
+}
+
+/* ズーム倍率に応じて出し入れする要素（script.js の LOD_RULES で制御） */
+#map-container .lod-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#map-container svg > g {
+    transition: opacity 0.2s ease, visibility 0.2s;
+}
+
+/* ズームボタン */
+.zoom-controls {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.zoom-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: #2c3e50;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.zoom-btn:hover {
+    background-color: #ecf5fd;
+}
+
+.zoom-btn:disabled {
+    color: #bbb;
+    cursor: default;
+}
+
+/* 操作ヒント（最初の操作で消える） */
+.map-hint {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    max-width: calc(100% - 80px);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 12px;
+    font-size: 0.8em;
+    color: #fff;
+    white-space: nowrap;
+    background-color: rgba(44, 62, 80, 0.75);
+    border-radius: 999px;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.map-hint.is-faded {
+    opacity: 0;
+}
+
+/* 「拡大すると表示されます」などの通知 */
+.map-toast {
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    transform: translate(-50%, -6px);
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 0.85em;
+    color: #fff;
+    background-color: rgba(44, 62, 80, 0.9);
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.map-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* =========================================
+   表示切り替えパネル
+   ========================================= */
+.control-panel {
+    padding: 15px 0 0;
+}
+
 .control-panel h3 {
-    width: 100%; 
-    text-align: center; /* 中央寄せを維持 */
-    margin-bottom: 10px;
-    color: #2c3e50; 
+    margin: 0 0 10px;
     padding-bottom: 5px;
+    text-align: center;
+    color: #34495e;
     border-bottom: 2px solid #ecf0f1;
 }
 
-.control-item label {
+.control-panel h4 {
+    margin: 14px 0 8px;
+    font-size: 0.9em;
+    color: #34495e;
+    text-align: center;
+}
+
+.chip-row {
     display: flex;
-    align-items: center;
-    font-size: 1em;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* チェックボックスをチップ型のトグルボタンとして表示 */
+.chip {
+    position: relative;
+    display: inline-flex;
     cursor: pointer;
     user-select: none;
-    padding: 5px 10px; /* 見た目を整える */
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chip input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 0.95em;
+    white-space: nowrap;
+    color: #555;
     background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-.control-item input[type="checkbox"] {
-    margin-right: 8px;
-    transform: scale(1.1); 
-    accent-color: #3498db; 
+
+.chip input:checked + span {
+    color: #fff;
+    background-color: #3498db;
+    border-color: #3498db;
 }
-/* --- (既存のスタイルを保持) --- */
+
+.chip input:focus-visible + span {
+    outline: 2px solid #2980b9;
+    outline-offset: 2px;
+}
+
+/* コース別フラッグ（色の丸を凡例として表示） */
+.chip--flag span::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--flag-color);
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.chip--flag input:checked + span {
+    color: #333;
+    background-color: #fff;
+    border-color: var(--flag-color);
+    box-shadow: inset 0 0 0 1px var(--flag-color);
+}
+
+.chip--flag input:not(:checked) + span {
+    opacity: 0.55;
+}
+
+/* =========================================
+   PC（1024px〜）・タブレット/スマホ横向き：マップ + 右サイドパネル
+   ========================================= */
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 700px) {
+    .map-page {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 240px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .control-panel {
+        padding: 0;
+    }
+
+    .chip-row {
+        justify-content: flex-start;
+    }
+
+    .control-panel h3,
+    .control-panel h4 {
+        text-align: left;
+    }
+}
+
+/* PC（1024px〜）：画面いっぱいに表示 */
+@media (min-width: 1024px) {
+    .container {
+        width: auto;
+        max-width: none;
+        margin: 16px 16px 30px;
+        padding: 16px;
+    }
+
+    .map-viewport {
+        aspect-ratio: auto;
+        height: calc(100svh - 64px);
+        min-height: 480px;
+        max-height: none;
+    }
+
+    .control-panel {
+        max-height: calc(100svh - 64px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}
+
+/* 横向きで高さが低い端末（スマホ横向き・小さめのタブレット） */
+@media (orientation: landscape) and (max-height: 600px) {
+    .container {
+        margin-top: 0;
+        padding: 10px max(10px, env(safe-area-inset-right)) 10px max(10px, env(safe-area-inset-left));
+        border-radius: 0;
+    }
+
+    .map-viewport {
+        aspect-ratio: auto;
+        height: calc(100svh - 20px);
+        max-height: none;
+    }
+
+    .control-panel {
+        max-height: calc(100svh - 20px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .map-page {
+        grid-template-columns: minmax(0, 1fr) 200px;
+        gap: 12px;
+    }
+
+    .chip span {
+        min-height: 32px;
+        padding: 0 10px;
+        font-size: 0.85em;
+    }
+}
+
+/* =========================================
+   タブレット縦向き（600〜1023px）
+   ========================================= */
+@media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
+    .container {
+        width: auto;
+        margin: 16px 16px 30px;
+        padding: 16px;
+    }
+
+    .map-viewport {
+        aspect-ratio: auto;
+        height: min(60svh, 64vw);
+    }
+}
+
+/* =========================================
+   スマホ縦向き（〜599px）
+   ========================================= */
+@media (max-width: 599px) {
+    /* スマホでは背景画像を出さず、余った高さは地図に回す（フッターはパネルの直下） */
+    body {
+        background-color: #fff;
+    }
+
+    body::before {
+        display: none;
+    }
+
+    .container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+        padding-top: env(safe-area-inset-top);
+        border-radius: 0;
+        box-shadow: none;
+        background-color: #fff;
+    }
+
+    .map-frame {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 地図は画面幅いっぱい・残りの高さいっぱい */
+    .map-viewport {
+        flex-grow: 1;
+        aspect-ratio: auto;
+        height: auto;
+        min-height: 280px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .zoom-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .map-hint {
+        font-size: 0.75em;
+    }
+
+    .control-panel {
+        padding: 12px 0 16px;
+    }
+
+    .control-panel h3 {
+        margin: 0 16px 8px;
+        font-size: 1em;
+    }
+
+    .control-panel h4 {
+        margin: 12px 16px 6px;
+        text-align: left;
+    }
+
+    /* チップは折り返して全部見えるようにする */
+    .chip-row {
+        justify-content: flex-start;
+        gap: 6px;
+        padding: 0 16px;
+    }
+
+    .chip span {
+        min-height: 34px;
+        padding: 0 12px;
+        font-size: 0.9em;
+    }
+
+}
+
+/* =========================================
+   フッター
+   ========================================= */
+.main-footer {
+    /* 背景画像を透けさせるため、背景を半透明の濃い色に設定 */
+    background-color: rgba(44, 62, 80, 0.9);
+    color: #ecf0f1;
+    text-align: center;
+    padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    font-size: 0.85em;
+    margin-top: auto; /* 内容が短いときも画面下端に表示 */
+}
+
+.main-footer p {
+    margin: 5px 0;
+}
+
+.main-footer a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.main-footer a:hover {
+    color: #ffffff;
+}
+
+/* =========================================
+   その他（既存のスタイルを保持）
+   ========================================= */
 .center-content {
     text-align: center;
     padding-top: 50px;
@@ -91,63 +528,13 @@ h1, h2 {
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
 .main-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     background: linear-gradient(45deg, #2980b9, #3498db);
 }
 
-/* マップページ (map.html) のボタングループ */
-/* 今回はチェックボックス制御のため使用しませんが、既存のコードを保持 */
-.button-group {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: center;
-}
-
-.btn {
-    padding: 10px 15px;
-    font-size: 1em;
-    color: #3498db;
-    background-color: #fff;
-    border: 2px solid #3498db;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-grow: 1; 
-    flex-basis: 150px; 
-}
-
-.btn:hover {
-    background-color: #ecf5fd;
-    transform: translateY(-2px);
-}
-
-.btn.active {
-    background-color: #3498db;
-    color: #fff;
-    font-weight: bold;
-}
-
-/* 画像コンテナ */
-.image-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* レスポンシブ画像 */
-#map-image {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease;
-}
-
-/* 戻るリンク */
 .back-link {
     display: block;
     text-align: center;
@@ -155,75 +542,7 @@ h1, h2 {
     color: #555;
     text-decoration: none;
 }
+
 .back-link:hover {
     color: #000;
-}
-
-/* スマホ対応 (レスポンシブ) */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 15px;
-    }
-    .btn {
-        width: 50%; 
-        flex-basis: 100%;
-    }
-}
-
-
-
-/* --- フッターのスタイル --- */
-.main-footer {
-    /* 💡 変更: 背景画像を透けさせるため、背景を半透明の濃い色に設定 */
-    background-color: rgba(44, 62, 80, 0.9); 
-    color: #ecf0f1;
-    text-align: center;
-    padding: 20px 20px;
-    font-size: 0.85em;
-    margin-top: 30px; 
-}
-.main-footer p {
-    margin: 5px 0;
-}
-
-.main-footer a {
-    color: #3498db; 
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.main-footer a:hover {
-    color: #ffffff;
-}
-
-/* --- control-panelの見出しの調整 --- */
-/* .control-panel h3 のスタイル調整（見やすくするため） */
-.control-panel h3 {
-    width: 100%; 
-    text-align: center;
-    margin-bottom: 10px;
-    color: #34495e;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #ecf0f1;
-}
-
-/* --- bodyのpadding調整 --- */
-/* bodyのpaddingを削除し、ヘッダー/フッターが画面端まで広がるようにします */
-body {
-    /* 既存のbodyスタイルから padding: 20px; を削除または上書き */
-    padding: 0;
-    margin: 0;
-    /* その他のフォント設定などは維持 */
-}
-
-/* .container のpadding-left/right は維持 */
-.container {
-    padding: 20px 20px;
-}
-svg text {
-    /* 💡 変更: フォントファミリーを 'Zen Kaku Gothic Antique' に変更 */
-    font-family: 'Zen Kaku Gothic Antique', sans-serif !important; 
 }
