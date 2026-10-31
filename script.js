@@ -7,7 +7,6 @@ const MAP_BOUNDS = { x: 0, y: 15, width: 851, height: 460 };
 
 // 最大ズーム（画面1pxあたりのSVG座標の倍率）
 const MAX_SCALE = 12;
-
 // ズーム倍率（画面1px あたりの SVG 座標単位）がこの値以上になったら表示するグループ
 // 文字が小さいグループほど、拡大しないと表示しない
 const LOD_RULES = {
@@ -97,10 +96,12 @@ function setupPanZoom(container) {
     function clampCenter() {
         const viewWidth = width / view.scale;
         const viewHeight = height / view.scale;
-        const clampAxis = (center, start, size, viewSize) =>
-            viewSize >= size
-                ? start + size / 2
-                : Math.min(Math.max(center, start + viewSize / 2), start + size - viewSize / 2);
+        // 表示範囲がマップより大きいときは、マップが表示範囲からはみ出さない範囲で動かせる
+        const clampAxis = (center, start, size, viewSize) => {
+            const min = Math.min(start + viewSize / 2, start + size - viewSize / 2);
+            const max = Math.max(start + viewSize / 2, start + size - viewSize / 2);
+            return Math.min(Math.max(center, min), max);
+        };
 
         view.cx = clampAxis(view.cx, MAP_BOUNDS.x, MAP_BOUNDS.width, viewWidth);
         view.cy = clampAxis(view.cy, MAP_BOUNDS.y, MAP_BOUNDS.height, viewHeight);
@@ -125,10 +126,18 @@ function setupPanZoom(container) {
         zoomOutButton.disabled = view.scale <= fitScale() + 0.001;
     }
 
+    // 全体表示：縦長の画面では地図を上に寄せ、下の空きにボタン類が来るようにする
+    function fitTarget() {
+        const scale = fitScale();
+        return {
+            scale,
+            cx: MAP_BOUNDS.x + MAP_BOUNDS.width / 2,
+            cy: MAP_BOUNDS.y + height / scale / 2,
+        };
+    }
+
     function fit() {
-        view.scale = fitScale();
-        view.cx = MAP_BOUNDS.x + MAP_BOUNDS.width / 2;
-        view.cy = MAP_BOUNDS.y + MAP_BOUNDS.height / 2;
+        Object.assign(view, fitTarget());
         render();
     }
 
@@ -277,15 +286,29 @@ function setupPanZoom(container) {
             markInteracted();
             const action = button.dataset.zoom;
             if (action === 'fit') {
-                animateTo({
-                    scale: fitScale(),
-                    cx: MAP_BOUNDS.x + MAP_BOUNDS.width / 2,
-                    cy: MAP_BOUNDS.y + MAP_BOUNDS.height / 2,
-                });
+                animateTo(fitTarget());
                 return;
             }
             animateZoom(width / 2, height / 2, action === 'in' ? 1.6 : 1 / 1.6);
         });
+    });
+
+    // --- 全画面表示（地図だけを画面いっぱいに表示） ---
+    const fullscreenButton = document.querySelector('[data-fullscreen]');
+
+    function setFullscreen(isFullscreen) {
+        document.body.classList.toggle('is-map-fullscreen', isFullscreen);
+        fullscreenButton.setAttribute('aria-pressed', String(isFullscreen));
+        fullscreenButton.setAttribute('aria-label', isFullscreen ? '全画面を終了' : '全画面で表示');
+    }
+
+    fullscreenButton.addEventListener('click', () => {
+        markInteracted();
+        setFullscreen(!document.body.classList.contains('is-map-fullscreen'));
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') setFullscreen(false);
     });
 
     // --- 画面サイズ・向きの変更 ---

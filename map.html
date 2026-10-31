@@ -31,7 +31,11 @@
             <div class="zoom-controls">
                 <button type="button" class="zoom-btn" data-zoom="in" aria-label="拡大">＋</button>
                 <button type="button" class="zoom-btn" data-zoom="out" aria-label="縮小">－</button>
-                <button type="button" class="zoom-btn" data-zoom="fit" aria-label="全体を表示">⤢</button>
+                <button type="button" class="zoom-btn" data-zoom="fit" aria-label="全体を表示">全体</button>
+                <button type="button" class="zoom-btn zoom-btn--fullscreen" data-fullscreen aria-label="全画面で表示" aria-pressed="false">
+                    <svg class="icon-expand" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg class="icon-collapse" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
             </div>
 
             <p class="map-hint">ドラッグで移動 ／ ピンチ・ホイールで拡大</p>
