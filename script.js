@@ -126,18 +126,30 @@ function setupPanZoom(container) {
         zoomOutButton.disabled = view.scale <= fitScale() + 0.001;
     }
 
-    // 全体表示：縦長の画面では地図を上に寄せ、下の空きにボタン類が来るようにする
+    // 全体表示：地図全体を上下左右の中央に表示する
     function fitTarget() {
-        const scale = fitScale();
         return {
-            scale,
+            scale: fitScale(),
             cx: MAP_BOUNDS.x + MAP_BOUNDS.width / 2,
-            cy: MAP_BOUNDS.y + height / scale / 2,
+            cy: MAP_BOUNDS.y + MAP_BOUNDS.height / 2,
         };
     }
 
     function fit() {
         Object.assign(view, fitTarget());
+        render();
+    }
+
+    // 最初の表示：縦長の画面（スマホ縦向き）では、地図の高さを画面いっぱいにして左端から表示する
+    function showInitialView() {
+        const isPortrait = height / width > (MAP_BOUNDS.height / MAP_BOUNDS.width) * 1.2;
+        if (!isPortrait) {
+            fit();
+            return;
+        }
+        view.scale = Math.min(height / MAP_BOUNDS.height, MAX_SCALE);
+        view.cx = MAP_BOUNDS.x + width / view.scale / 2;
+        view.cy = MAP_BOUNDS.y + MAP_BOUNDS.height / 2;
         render();
     }
 
@@ -316,11 +328,13 @@ function setupPanZoom(container) {
         const newWidth = container.clientWidth;
         const newHeight = container.clientHeight;
         if (newWidth === width && newHeight === height) return;
-        // 操作前なら全体表示を保ち、操作後は同じ場所・同じ縮尺を保つ
+        // 操作前：初期表示をやり直す ／ 全体表示中：全体表示を保つ ／ それ以外：同じ場所・同じ縮尺を保つ
         const wasFit = view.scale <= fitScale() + 0.001;
         width = newWidth;
         height = newHeight;
-        if (!hasInteracted || wasFit) {
+        if (!hasInteracted) {
+            showInitialView();
+        } else if (wasFit) {
             fit();
         } else {
             render();
@@ -330,7 +344,7 @@ function setupPanZoom(container) {
     new ResizeObserver(handleResize).observe(container);
     window.addEventListener('resize', handleResize);
 
-    fit();
+    showInitialView();
 
     return {
         // 指定したグループが、今のズームでは小さすぎて隠れているか
@@ -382,13 +396,13 @@ function setupToggles(map) {
             const targetIds = applyCheckbox(checkbox);
             if (checkbox.dataset.flag !== undefined) syncFlagAll();
 
-            // ONにしたのに、ズームが足りずに見えない場合は案内する
+            // ON にしても今のズームでは LOD で隠れている場合は、拡大を促す
             if (checkbox.checked && targetIds.some(id => map.isHiddenByZoom(id))) {
                 showToast('拡大すると表示されます');
             }
         });
 
-        // --- 初期状態の反映 ---
+        // HTML 側の checked の状態を、読み込み時に SVG へ反映する
         applyCheckbox(checkbox);
     });
 
