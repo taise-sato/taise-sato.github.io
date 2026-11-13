@@ -1,107 +1,205 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>スキー場マップ</title>
 
-    <!-- ウェブアプリ（ホーム画面に追加）用の設定 -->
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#2c3e50">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="国際マップ">
-    <link rel="apple-touch-icon" href="images/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/icons/favicon-32.png">
+    <!-- 検索エンジンの検索結果に表示しない -->
+    <meta name="robots" content="noindex">
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#2c3e50" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="国際マップ" />
+    <link rel="apple-touch-icon" href="images/icons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="images/icons/favicon-32.png" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique:wght@700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique:wght@700&display=swap"
+      rel="stylesheet" />
 
-    <link rel="stylesheet" href="stylesheet.css">
-</head>
-<body>
-
+    <link rel="stylesheet" href="stylesheet.css" />
+  </head>
+  <body>
     <main class="container map-page">
-        <div class="map-frame">
-            <!-- SVG本体は images/ から script.js で読み込んで差し込む -->
-            <div id="map-container" class="map-viewport" data-src="images/Sapporo_KOKUSAI_Ski_Area_Map_ver3.svg" aria-label="札幌国際スキー場マップ（ドラッグで移動、ピンチまたはホイールで拡大縮小）">
-                <p class="map-status">マップを読み込み中…</p>
-            </div>
-
-            <div class="zoom-controls">
-                <button type="button" class="zoom-btn" data-zoom="in" aria-label="拡大">＋</button>
-                <button type="button" class="zoom-btn" data-zoom="out" aria-label="縮小">－</button>
-                <button type="button" class="zoom-btn" data-zoom="fit" aria-label="全体を表示">全体</button>
-                <button type="button" class="zoom-btn zoom-btn--fullscreen" data-fullscreen aria-label="全画面で表示" aria-pressed="false">
-                    <svg class="icon-expand" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <svg class="icon-collapse" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-            </div>
-
-            <p class="map-hint">ドラッグで移動 ／ ピンチ・ホイールで拡大</p>
-            <p class="map-toast" role="status" aria-live="polite"></p>
+      <div class="map-frame">
+        <!-- SVG本体は images/ から script.js で読み込んで差し込む -->
+        <div
+          id="map-container"
+          class="map-viewport"
+          data-src="images/Sapporo_KOKUSAI_Ski_Area_Map_ver3.svg"
+          aria-label="札幌国際スキー場マップ（ドラッグで移動、ピンチまたはホイールで拡大縮小）">
+          <p class="map-status">マップを読み込み中…</p>
         </div>
 
-        <section class="control-panel">
-            <h3>表示要素の切り替え</h3>
+        <div class="zoom-controls">
+          <button
+            type="button"
+            class="zoom-btn"
+            data-zoom="in"
+            aria-label="拡大">
+            ＋
+          </button>
+          <button
+            type="button"
+            class="zoom-btn"
+            data-zoom="out"
+            aria-label="縮小">
+            －
+          </button>
+          <button
+            type="button"
+            class="zoom-btn"
+            data-zoom="fit"
+            aria-label="全体を表示">
+            全体
+          </button>
+          <button
+            type="button"
+            class="zoom-btn zoom-btn--fullscreen"
+            data-fullscreen
+            aria-label="全画面で表示"
+            aria-pressed="false">
+            <svg
+              class="icon-expand"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true">
+              <path
+                d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <svg
+              class="icon-collapse"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              aria-hidden="true">
+              <path
+                d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
 
-            <div class="chip-row">
-                <label class="chip">
-                    <input type="checkbox" checked data-target-id="_x31_5_x5F_SubCoursename,_x31_4_x5F_Objectsname">
-                    <span>地名</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" checked data-target-id="_x32_5_x5F_Orangename,_x32_4_x5F_orange">
-                    <span>オレンジフェンス</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" checked data-target-id="_x32_7_x5F_Banarname,_x32_6_x5F_banar">
-                    <span>バナー</span>
-                </label>
-                <label class="chip">
-                    <input type="checkbox" checked data-flag-all>
-                    <span>フラッグ</span>
-                </label>
-            </div>
+        <p class="map-hint">ドラッグで移動 ／ ピンチ・ホイールで拡大</p>
+        <p class="map-toast" role="status" aria-live="polite"></p>
+      </div>
 
-            <h4>フラッグ（コース別）</h4>
-            <div class="chip-row chip-row--legend">
-                <label class="chip chip--flag" style="--flag-color: #231815;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_0_x5F_Frags">
-                    <span>ダウンヒル</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #1b6925;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_1_x5F_Frags">
-                    <span>林間</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #629939;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_2_x5F_Frags">
-                    <span>メルヘン</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #cb3252;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_3_x5F_Frags">
-                    <span>ファミリー</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #c8161d;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_4_x5F_Frags">
-                    <span>スイング</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #830009;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_5_x5F_Frags">
-                    <span>エコー</span>
-                </label>
-                <label class="chip chip--flag" style="--flag-color: #801b75;">
-                    <input type="checkbox" checked data-flag data-target-id="_x35_6_x5F_Frags">
-                    <span>ウッディー</span>
-                </label>
-            </div>
-        </section>
+      <section class="control-panel">
+        <h3>表示要素の切り替え</h3>
+
+        <div class="chip-row">
+          <label class="chip">
+            <input
+              type="checkbox"
+              checked
+              data-target-id="_x31_5_x5F_SubCoursename,_x31_4_x5F_Objectsname" />
+            <span>地名</span>
+          </label>
+          <label class="chip">
+            <input
+              type="checkbox"
+              checked
+              data-target-id="_x32_5_x5F_Orangename,_x32_4_x5F_orange" />
+            <span>オレンジフェンス</span>
+          </label>
+          <label class="chip">
+            <input
+              type="checkbox"
+              checked
+              data-target-id="_x32_7_x5F_Banarname,_x32_6_x5F_banar" />
+            <span>バナー</span>
+          </label>
+          <label class="chip">
+            <input type="checkbox" checked data-flag-all />
+            <span>フラッグ</span>
+          </label>
+        </div>
+
+        <h4>フラッグ（コース別）</h4>
+        <div class="chip-row chip-row--legend">
+          <label class="chip chip--flag" style="--flag-color: #231815">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_0_x5F_Frags" />
+            <span>ダウンヒル</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #1b6925">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_1_x5F_Frags" />
+            <span>林間</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #629939">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_2_x5F_Frags" />
+            <span>メルヘン</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #cb3252">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_3_x5F_Frags" />
+            <span>ファミリー</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #c8161d">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_4_x5F_Frags" />
+            <span>スイング</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #830009">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_5_x5F_Frags" />
+            <span>エコー</span>
+          </label>
+          <label class="chip chip--flag" style="--flag-color: #801b75">
+            <input
+              type="checkbox"
+              checked
+              data-flag
+              data-target-id="_x35_6_x5F_Frags" />
+            <span>ウッディー</span>
+          </label>
+        </div>
+      </section>
     </main>
 
     <footer class="main-footer">
-        <p>&copy; 2026 Taise SATO All rights reserved.</p>
+      <p>&copy; 2026 Taise SATO All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

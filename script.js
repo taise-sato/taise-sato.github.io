@@ -142,7 +142,7 @@ function setupPanZoom(container) {
 
     // 最初の表示：縦長の画面（スマホ縦向き）では、地図の高さを画面いっぱいにして左端から表示する
     function showInitialView() {
-        const isPortrait = height / width > (MAP_BOUNDS.height / MAP_BOUNDS.width) * 1.2;
+        const isPortrait = height > width;
         if (!isPortrait) {
             fit();
             return;

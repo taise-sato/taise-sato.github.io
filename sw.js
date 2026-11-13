@@ -2,7 +2,7 @@
    Service Worker：オフライン対応（電波の弱いゲレンデでもマップを開けるようにする）
    ファイルを大きく変えたときは CACHE_VERSION を上げると、古いキャッシュが削除される
    ========================================= */
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v6';
 const CACHE_NAME = `kokusai-map-${CACHE_VERSION}`;
 
 // 最初にまとめてキャッシュしておくファイル
